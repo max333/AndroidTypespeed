@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ public class MainActivity extends Activity {
 	private Game game;
 	private EditText userInput;
 	private BlockingQueue<UserKeyEvent> userInputEventsQueue = new LinkedBlockingQueue<UserKeyEvent>();
+	private BlockingQueue<CharSequence> userSubmitWordEventsQueue = new LinkedBlockingQueue<CharSequence>();
 	private TextWatcher userEditListener;
 
 	/**
@@ -59,6 +62,9 @@ public class MainActivity extends Activity {
 		userInput.addTextChangedListener(userEditListener);
 	}
 
+	// "Enter", "Tab" or "Space"
+	private final Pattern PATTERN_USER_SUBMIT = Pattern.compile("[\\n\\t ]+");
+
 	/**
 	 * 
 	 */
@@ -69,8 +75,14 @@ public class MainActivity extends Activity {
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
+			/**
+			 * Sends everything to the BlockingQueue, in a non-blocking way.
+			 * If "\n" or "\t" or " " are the added values, everything before the last such symbol is 
+			 * removed from the EditText.
+			 */
 			@Override
 			public void onTextChanged(CharSequence string, int start, int before, int count) {
+				// This loop only entered if text is added, not deleted.
 				for (int index = start; index < (start + count); index++) {
 					char cchar = string.charAt(index);
 					Log.d(TAG, "adding to queue: " + Character.toString(cchar));
@@ -80,8 +92,33 @@ public class MainActivity extends Activity {
 				}
 			}
 
+			/**
+			 * Each word followed by "Enter", "Tab" or "Space" is sent to the worker thread.
+			 * They are also removed from the display area.  Characters following are untouched.
+			 */
 			@Override
 			public void afterTextChanged(Editable s) {
+				int previousValidRegionStart = 0;
+				int previousValidRegionEnd = 0;
+				int nextRegionStart = 0;
+				if (s.length() != 0) {
+					Matcher matcher = PATTERN_USER_SUBMIT.matcher(s);
+					while (matcher.find()) {
+						previousValidRegionEnd = matcher.start() - 1;
+						nextRegionStart = matcher.end(); // The first char after the matched
+															// pattern.
+						if (previousValidRegionEnd >= 0) {
+							CharSequence previousValidWord = s.subSequence(previousValidRegionStart, previousValidRegionEnd);
+							if (previousValidWord != null && previousValidWord.length() != 0) {
+								Log.d(TAG, "adding word: " + previousValidWord);
+								userSubmitWordEventsQueue.offer(previousValidWord);
+							}
+						}
+					}
+				}
+				if (nextRegionStart != 0) {
+					s.delete(0, nextRegionStart);
+				}
 			}
 		};
 	}
@@ -96,12 +133,20 @@ public class MainActivity extends Activity {
 			@Override
 			public boolean run(float dt) {
 				List<UserKeyEvent> userInput = new ArrayList<UserKeyEvent>();
-				while (!userInputEventsQueue.isEmpty()) {
-					UserKeyEvent temp = userInputEventsQueue.poll();
-					Log.d(TAG, "polling from queue: one element: " + Character.toString(temp.getKey()));
-					userInput.add(temp);
+				List<CharSequence> submittedWords = new ArrayList<CharSequence>();
+				{
+					while (!userInputEventsQueue.isEmpty()) {
+						UserKeyEvent temp = userInputEventsQueue.poll();
+						Log.d(TAG, "polling from queue: one element: " + Character.toString(temp.getKey()));
+						userInput.add(temp);
+					}
+					while (!userSubmitWordEventsQueue.isEmpty()) {
+						CharSequence submittedWord = userSubmitWordEventsQueue.poll();
+						Log.d(TAG, "switching thread for submitted word: " + submittedWord);
+						submittedWords.add(submittedWord);
+					}
 				}
-				game.update(dt, userInput);
+				game.update(dt, submittedWords, userInput);
 				updateTypespeedView(dt);
 				return true;
 			}
