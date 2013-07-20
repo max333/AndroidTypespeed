@@ -1,0 +1,26 @@
++ Clock for drawing.  
+  The input events, or output (new word) do not have to trigger a redraw
+  of the TypespeedView, but they can redraw the EditView (clear on Enter or Space).
+  Each input event change the echo area and possibly the main scrolling view.
+  BlockingQueue to communicate between UI input thread and worker thread.
+
+
++ Settings: 
+    -color pickers (background/text). Might need a third color if typed characters are shown.
+    -speed
+    -text size, font
+    
++ High scores, separated by speed level
+
++ After each game show the errors.
+
++ Sound effects.  Haptic effect.
+
++ It looks like the keyboard is just hiding the stuff underneath, not resizing
+  everything.
+
++ Pause (user request, or phone call...).  Should save the full game state.
+  What if the orientation changed... are the rules even the same?
+  The number of lines are going to be different.
+  The speed for each word should be different: (full length - word length) / dt.
+  Vary the speed according to word length such that each word remains on screen the same time.
