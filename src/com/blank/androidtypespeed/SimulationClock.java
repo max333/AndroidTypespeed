@@ -119,7 +119,7 @@ public class SimulationClock {
 	 */
 	public void runAndScheduleNextRun() {
 		if (!isStopped) {
-			Log.i(TAG, "dt = " + getDTForLastMark());
+			//Log.i(TAG, "dt = " + getDTForLastMark());
 			// Log.i("SimulationClock", "target dt = " + timeIntervalAnimationMs);
 			markTimeStep();
 
@@ -133,7 +133,7 @@ public class SimulationClock {
 
 			boolean runSuccess = runner.run(dtElapsed);
 
-			Log.d(TAG, "just finished the runner");
+			//Log.d(TAG, "just finished the runner");
 			
 			if (runSuccess) {
 				long currentTime = SystemClock.elapsedRealtime();
@@ -144,7 +144,7 @@ public class SimulationClock {
 						timeToNextRunMS = minMS;
 				}
 				// recursive call to itself, in the future.
-				Log.d(TAG, "Scheduling task in ms: " + timeToNextRunMS);
+				//Log.d(TAG, "Scheduling task in ms: " + timeToNextRunMS);
 				currentlyScheduledTask = scheduler.schedule(runnableRunAndScheduleNextRun, timeToNextRunMS, TimeUnit.MILLISECONDS);
 			} else {
 				// something failed in the Runner, so we stop the clock.

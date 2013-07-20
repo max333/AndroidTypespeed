@@ -22,4 +22,9 @@ public class UserKeyEvent {
 	public char getKey() {
 		return key;
 	}
+
+	@Override
+	public String toString() {
+		return Character.toString(key);
+	}	
 }

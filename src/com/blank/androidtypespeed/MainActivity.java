@@ -1,9 +1,16 @@
 package com.blank.androidtypespeed;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -13,12 +20,15 @@ import android.widget.EditText;
  * 
  */
 public class MainActivity extends Activity {
+	protected static final String TAG = "MainActivity";
 	private TypespeedView typespeedView;
 	private SimulationClock simulationClock;
 	private SimulationClock.Runner runner;
 	private Game game;
 	private EditText userInput;
-	
+	private BlockingQueue<UserKeyEvent> userInputEventsQueue = new LinkedBlockingQueue<UserKeyEvent>();
+	private TextWatcher userEditListener;
+
 	/**
 	 * 
 	 */
@@ -41,8 +51,39 @@ public class MainActivity extends Activity {
 				simulationClock.runAndScheduleNextRun();
 			};
 		});
-		
+
 		userInput = (EditText) findViewById(R.id.user_input);
+		userInput.setRawInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS); // TODO could put in xml
+																			// instead?
+		initUserEditListener();
+		userInput.addTextChangedListener(userEditListener);
+	}
+
+	/**
+	 * 
+	 */
+	private void initUserEditListener() {
+		userEditListener = new TextWatcher() {
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence string, int start, int before, int count) {
+				for (int index = start; index < (start + count); index++) {
+					char cchar = string.charAt(index);
+					Log.d(TAG, "adding to queue: " + Character.toString(cchar));
+					UserKeyEvent userKeyEvent = new UserKeyEvent(null, cchar);
+					userInputEventsQueue.offer(userKeyEvent);
+					Log.d(TAG, "adding to queue done.");
+				}
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+			}
+		};
 	}
 
 	/**
@@ -54,23 +95,17 @@ public class MainActivity extends Activity {
 
 			@Override
 			public boolean run(float dt) {
-				List<UserKeyEvent> userInput = fetchUserInputOnUIThread();
+				List<UserKeyEvent> userInput = new ArrayList<UserKeyEvent>();
+				while (!userInputEventsQueue.isEmpty()) {
+					UserKeyEvent temp = userInputEventsQueue.poll();
+					Log.d(TAG, "polling from queue: one element: " + Character.toString(temp.getKey()));
+					userInput.add(temp);
+				}
 				game.update(dt, userInput);
 				updateTypespeedView(dt);
 				return true;
 			}
 		};
-	}
-
-
-	/**
-	 * 
-	 * @return
-	 */
-	private List<UserKeyEvent> fetchUserInputOnUIThread() {
-		// TODO use a thread-safe list.  Must empty the list and clear it atomically.  Use a lock with normal list?
-		// Or just a volatile list, creating a new one each time.
-		return null;
 	}
 
 	/**
@@ -80,7 +115,7 @@ public class MainActivity extends Activity {
 		typespeedView.setWordsWithCoordinates(game.getWords());
 		typespeedView.postInvalidate(); // must be called from UI thread
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -90,7 +125,7 @@ public class MainActivity extends Activity {
 		simulationClock.initializeClock();
 		simulationClock.runAndScheduleNextRun();
 	}
-	
+
 	/**
 	 * 
 	 */
