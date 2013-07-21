@@ -20,6 +20,8 @@ import android.widget.EditText;
 
 /**
  * 
+ * Note: in the manifest.xml, this activity is declared with android:windowSoftInputMode="adjustResize"
+ * so the software keyboard won't just hide the TypespeedView, but resize it.
  */
 public class MainActivity extends Activity {
 	protected static final String TAG = "MainActivity";

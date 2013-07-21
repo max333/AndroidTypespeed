@@ -5,5 +5,10 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="lib" path="D:/EclipseWorkspace/AndroidTypespeed/libs/guava-14.0.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/D:/EclipseWorkspace/AndroidTypespeed/libs/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

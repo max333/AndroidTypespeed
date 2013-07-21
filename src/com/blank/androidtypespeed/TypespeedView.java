@@ -1,6 +1,6 @@
 package com.blank.androidtypespeed;
 
-import java.util.List;
+import java.util.Collection;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -21,7 +21,7 @@ public class TypespeedView extends View {
 	private final static String TAG = "TypespeedView";
 	private TextPaint textPaint;
 	private Paint backgroundPaint;
-	private List<WordWithCoordinates> words;
+	private Collection<WordWithCoordinates> words;
 
 	public TypespeedView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -54,7 +54,7 @@ public class TypespeedView extends View {
 	/**
 	 *
 	 */
-	public void setWordsWithCoordinates(List<WordWithCoordinates> words) {
+	public void setWordsWithCoordinates(Collection<WordWithCoordinates> words) {
 		this.words = words;
 	}
 
@@ -89,5 +89,5 @@ public class TypespeedView extends View {
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		Log.d(TAG, "measure: " + widthMeasureSpec + " x " + heightMeasureSpec);
-	}	
+	}
 }

@@ -1,10 +1,3 @@
-+ Clock for drawing.  
-  The input events, or output (new word) do not have to trigger a redraw
-  of the TypespeedView, but they can redraw the EditView (clear on Enter or Space).
-  Each input event change the echo area and possibly the main scrolling view.
-  BlockingQueue to communicate between UI input thread and worker thread.
-
-
 + Settings: 
     -color pickers (background/text). Might need a third color if typed characters are shown.
     -speed
@@ -24,3 +17,11 @@
   The number of lines are going to be different.
   The speed for each word should be different: (full length - word length) / dt.
   Vary the speed according to word length such that each word remains on screen the same time.
+
++ Maybe could save the positions as percent of screen size.  Could then refit on 
+  deformed screen.  Maybe the words would overlap then, but a small price to pay.
+  Could also change the font size on resize.
+  
++ Will need to find some list of words.
+
++ Make an "About" about the history and link to code on github.
