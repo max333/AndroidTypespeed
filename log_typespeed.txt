@@ -1,23 +1,29 @@
-+ Change the x, y measures such that they are screen percent.
-  Will also need some way to figure out the dimension of a word on the current
-  screen configuration and adjust the speed, the out-of-bounds and the placement
-  of new words accordingly.
++ Word generator over time to keep up with a time increasing target rate. Log.
 
-+ When showing game over dialog, maybe disable buttons for 0.25s.
++ Related to above, but different: increase the scroll speed.  It is not actually necessary,
+  but it would be better on smaller screens to avoid word overlaps when many words are being
+  generated.
+
++ Modify OutOfBounds such that it checks for the right side of the word getting out
+  instead of the left.  Will also need to modify the speed of each word depending on its width
+  if each word is to spend the same time on screen.
+
++ When showing game over dialog, maybe disable buttons for 0.25s in case the user is typing furiously and
+  might hit a Dialog button.
+
++ High scores, separated by speed level.
+
++ After each game show the errors in a Dialog.
 
 + Settings: 
     -color pickers (background/text). Might need a third color if typed characters are shown.
     -speed
     -text size, font
     
-+ High scores, separated by speed level
-
-+ After each game show the errors in a Dialog.
-
 + Sound effects.  Haptic effect.
   http://www.freesound.org/search/?q=error
 
-+ Pause (user request, or phone call...).  Should save the full game state.
++ Pause (user request, or phone call...).  Should save the full game state (GSON?).
   What if the orientation changed... are the rules even the same?
   The number of lines are going to be different.
   The speed for each word should be different: (full length - word length) / dt.
@@ -33,5 +39,11 @@
 + Make an "About" about the history and link to code on github.
   Creative commons attribution if needed.
 
-+ Game variant: mirror.
++ Game variant: mirror (reversed words and text flowing the "wrong" way).
   The configuration could also be used for internationalization.
+
++ Game variant: Add numbers or symbols to words.
+  
++ Target api 2.3 since I read somewhere in Android Pro 4 about proguard or such being
+  setup only for that version and higher.
+  

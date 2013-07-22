@@ -53,6 +53,8 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onGameOver() {
+				simulationClock.stop();
+				
 				MainActivity.this.runOnUiThread(new Runnable() {
 
 					@Override
@@ -177,7 +179,7 @@ public class MainActivity extends Activity {
 					}
 				}
 				game.update(dt, submittedWords, userInput);
-				updateTypespeedView(dt);
+				updateTypespeedViewOnUIThread(dt);
 				return true;
 			}
 		};
@@ -186,7 +188,7 @@ public class MainActivity extends Activity {
 	/**
 	 * 
 	 */
-	private void updateTypespeedView(float dt) {
+	private void updateTypespeedViewOnUIThread(float dt) {
 		typespeedView.setWordsWithCoordinates(game.getWords());
 		typespeedView.postInvalidate(); // must be called from UI thread
 	}
