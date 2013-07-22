@@ -1,7 +1,7 @@
 package com.blank.androidtypespeed;
 
 /**
- * 
+ * X and y are between 0 and 1.
  */
 public class WordWithCoordinates {
 	private String word;
@@ -41,6 +41,9 @@ public class WordWithCoordinates {
 	public void setY(float y) {
 		this.y = y;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "WordWithCoordinates [word=" + word + ", x=" + x + ", y=" + y + "]";
+	}
 }

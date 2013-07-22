@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		int timeIntervalAnimationMs = 30;
-		initializeRunner();
+		initializeWorkerThreadRunner();
 		simulationClock = new SimulationClock(timeIntervalAnimationMs, runner);
 		typespeedView = (TypespeedView) findViewById(R.id.typespeed_view);
 
@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
 				if (s.length() != 0) {
 					Matcher matcher = PATTERN_USER_SUBMIT.matcher(s);
 					while (matcher.find()) {
-						previousValidRegionEnd = matcher.start() - 1;
+						previousValidRegionEnd = matcher.start();
 						nextRegionStart = matcher.end(); // The first char after the matched
 															// pattern.
 						if (previousValidRegionEnd >= 0) {
@@ -128,7 +128,7 @@ public class MainActivity extends Activity {
 	/**
 	 * 
 	 */
-	private void initializeRunner() {
+	private void initializeWorkerThreadRunner() {
 		// Careful: this does not run on the UI thread.
 		runner = new SimulationClock.Runner() {
 
@@ -144,7 +144,7 @@ public class MainActivity extends Activity {
 					}
 					while (!userSubmitWordEventsQueue.isEmpty()) {
 						CharSequence submittedWord = userSubmitWordEventsQueue.poll();
-						Log.d(TAG, "switching thread for submitted word: " + submittedWord);
+						Log.d(TAG, "reading from BlockingQueue submitted word: " + submittedWord);
 						submittedWords.add(submittedWord);
 					}
 				}

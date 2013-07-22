@@ -118,6 +118,7 @@ public class SimulationClock {
 	 * Calls itself recursively, with a delay.
 	 */
 	public void runAndScheduleNextRun() {
+		try {
 		if (!isStopped) {
 			//Log.i(TAG, "dt = " + getDTForLastMark());
 			// Log.i("SimulationClock", "target dt = " + timeIntervalAnimationMs);
@@ -144,7 +145,7 @@ public class SimulationClock {
 						timeToNextRunMS = minMS;
 				}
 				// recursive call to itself, in the future.
-				//Log.d(TAG, "Scheduling task in ms: " + timeToNextRunMS);
+//				Log.d(TAG, "Scheduling task in ms: " + timeToNextRunMS);
 				currentlyScheduledTask = scheduler.schedule(runnableRunAndScheduleNextRun, timeToNextRunMS, TimeUnit.MILLISECONDS);
 			} else {
 				// something failed in the Runner, so we stop the clock.
@@ -152,6 +153,9 @@ public class SimulationClock {
 			}
 		} else {
 			Log.i(TAG, "not running the simulation step because it was stopped.");
+		}
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 	}
 	

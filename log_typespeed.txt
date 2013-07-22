@@ -1,3 +1,10 @@
++ Change the x, y measures such that they are screen percent.
+  Will also need some way to figure out the dimension of a word on the current
+  screen configuration and adjust the speed, the out-of-bounds and the placement
+  of new words accordingly.
+
++ When showing game over dialog, maybe disable buttons for 0.25s.
+
 + Settings: 
     -color pickers (background/text). Might need a third color if typed characters are shown.
     -speed
@@ -5,12 +12,10 @@
     
 + High scores, separated by speed level
 
-+ After each game show the errors.
++ After each game show the errors in a Dialog.
 
 + Sound effects.  Haptic effect.
-
-+ It looks like the keyboard is just hiding the stuff underneath, not resizing
-  everything.
+  http://www.freesound.org/search/?q=error
 
 + Pause (user request, or phone call...).  Should save the full game state.
   What if the orientation changed... are the rules even the same?
@@ -22,6 +27,11 @@
   deformed screen.  Maybe the words would overlap then, but a small price to pay.
   Could also change the font size on resize.
   
-+ Will need to find some list of words.
++ Will need to find some list of words.  Maybe many languages.
+  Maybe let users use their own file.
 
 + Make an "About" about the history and link to code on github.
+  Creative commons attribution if needed.
+
++ Game variant: mirror.
+  The configuration could also be used for internationalization.

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.text.TextPaint;
@@ -23,6 +24,9 @@ public class TypespeedView extends View {
 	private Paint backgroundPaint;
 	private Collection<WordWithCoordinates> words;
 
+	/**
+	 * 
+	 */
 	public TypespeedView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		textPaint = new TextPaint();
@@ -63,12 +67,15 @@ public class TypespeedView extends View {
 	 */
 	@Override
 	public void onDraw(Canvas canvas) {
-		canvas.drawRect(canvas.getClipBounds(), backgroundPaint);
+		// TODO should set this rectangle once, in some appropriate lifecycle callback.\
+		Rect canvasRectangle = canvas.getClipBounds();
+		canvas.drawRect(canvasRectangle, backgroundPaint);
 		float ascent = textPaint.ascent();
 		// Log.d(TAG, "ascent = " + ascent);
 		if (words != null) {
 			for (WordWithCoordinates word : words) {
-				canvas.drawText(word.getWord(), word.getX(), -ascent + word.getY(), textPaint);
+				canvas.drawText(word.getWord(), word.getX() * canvasRectangle.width(),
+						-ascent + word.getY() * canvasRectangle.height(), textPaint);
 			}
 		}
 	}
