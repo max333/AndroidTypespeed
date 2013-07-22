@@ -17,14 +17,34 @@ public class Game {
 	private static final int MAX_FAILED_WORDS = 10;
 	private float velocity = 0.02f; // percent of screen / second
 	private Multimap<String, WordWithCoordinates> words = HashMultimap.create();
-	private List<CharSequence> successfulWords;
-	private List<CharSequence> erroneousWords;
+	private List<String> successfulWords;
+	private List<String> erroneousWords;
+	private List<String> reachedOutOfBoundsWords;
 	private int counterOutOfBoundsWords;
+	private float totalElapsedTime;
+	private WordReachedEndListener wordReachEndListener;
+	private GameOverListener gameOverListener;
+
+	/**
+	 * To be called when a word goes out of bound.
+	 */
+	public interface WordReachedEndListener {
+		public void onWordReachedEnd(int numberOfWordsToHaveReachedEnd);
+	}
+
+	/**
+	 * To be called when the game is over.
+	 */
+	public interface GameOverListener {
+		public void onGameOver(); // TODO pass the whole Game object back?
+	}
 
 	/**
 	 * 
 	 */
-	public Game() {
+	public Game(WordReachedEndListener wordReachEndListener, GameOverListener gameOverListener) {
+		this.wordReachEndListener = wordReachEndListener;
+		this.gameOverListener = gameOverListener;
 		init();
 	}
 
@@ -32,9 +52,11 @@ public class Game {
 	 * 
 	 */
 	private void init() {
-		successfulWords = new ArrayList<CharSequence>();
-		erroneousWords = new ArrayList<CharSequence>();
+		successfulWords = new ArrayList<String>();
+		erroneousWords = new ArrayList<String>();
+		reachedOutOfBoundsWords = new ArrayList<String>();
 		counterOutOfBoundsWords = 0;
+		totalElapsedTime = 0f;
 
 		String word = "hello";
 		words.put(word, new WordWithCoordinates(word, 0f, 0f));
@@ -47,11 +69,18 @@ public class Game {
 	 * @param userInput 
 	 * 
 	 */
-	public void update(float dt, List<CharSequence> submittedWords, List<UserKeyEvent> userInput) {
+	public void update(float dt, List<String> submittedWords, List<UserKeyEvent> userInput) {
+		totalElapsedTime += dt;
+
+		for (WordWithCoordinates word : words.values()) {
+			word.setX(word.getX() + velocity * dt);
+		}
+		
+		// Check if word(s) reached the end. Might terminate game.
+		// Will modify StatusView.
 		List<WordWithCoordinates> wordsOutOfBounds = new ArrayList<WordWithCoordinates>();
 		{
 			for (WordWithCoordinates word : words.values()) {
-				word.setX(word.getX() + velocity * dt);
 				boolean isOutOfBounds = checkIfWordOutOfBound(word);
 				if (isOutOfBounds) {
 					wordsOutOfBounds.add(word);
@@ -64,17 +93,22 @@ public class Game {
 			if (counterOutOfBoundsWords >= MAX_FAILED_WORDS)
 				gameOver();
 		}
-
+		if (!wordsOutOfBounds.isEmpty()) {
+			for (WordWithCoordinates wordOutOfBounds : wordsOutOfBounds) {
+				reachedOutOfBoundsWords.add(wordOutOfBounds.getWord());
+			}
+			wordReachEndListener.onWordReachedEnd(reachedOutOfBoundsWords.size());
+		}
+		
 		// Check if user got word(s) right.
 		// if (userInput != null && !userInput.isEmpty()) {
 		//
 		// }
 		if (submittedWords != null && !submittedWords.isEmpty()) {
-			for (CharSequence submittedWord : submittedWords) {
+			for (String submittedWord : submittedWords) {
 				Log.d(TAG, "processing submitted word: >>" + submittedWord + "<<");
 				// TODO CharSequence conversion to String create subtle bugs if done wrong.  Should go all String.
 				Collection<WordWithCoordinates> matchedWords = words.get(submittedWord.toString()); // returns empty on fail.
-				Collection<WordWithCoordinates> dummy = words.get("hello");
 				if (matchedWords.isEmpty()) {
 					erroneousWords.add(submittedWord);
 				} else {
@@ -99,8 +133,6 @@ public class Game {
 			}
 		}
 
-		// Check if word(s) reached the end. Might terminate game.
-		// Will modify StatusView.
 
 		// Check if new words need to be added.
 	}
@@ -116,8 +148,7 @@ public class Game {
 	 * 
 	 */
 	private void gameOver() {
-		// TODO call registered callback from MainActivity to stop clock and display result.
-		Log.d(TAG, "Game Over: not implemented yet.");
+		gameOverListener.onGameOver();
 	}
 
 	/**

@@ -2,12 +2,12 @@ package com.blank.androidtypespeed;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
+import android.widget.TextView;
 
 /**
  * Shows the number of missed words.
  */
-public class StatusView extends View {
+public class StatusView extends TextView {
 
 	/**
 	 * 

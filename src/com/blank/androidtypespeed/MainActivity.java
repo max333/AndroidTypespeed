@@ -26,12 +26,13 @@ import android.widget.EditText;
 public class MainActivity extends Activity {
 	protected static final String TAG = "MainActivity";
 	private TypespeedView typespeedView;
+	private StatusView statusView;
 	private SimulationClock simulationClock;
 	private SimulationClock.Runner runner;
 	private Game game;
 	private EditText userInput;
 	private BlockingQueue<UserKeyEvent> userInputEventsQueue = new LinkedBlockingQueue<UserKeyEvent>();
-	private BlockingQueue<CharSequence> userSubmitWordEventsQueue = new LinkedBlockingQueue<CharSequence>();
+	private BlockingQueue<String> userSubmitWordEventsQueue = new LinkedBlockingQueue<String>();
 	private TextWatcher userEditListener;
 
 	/**
@@ -46,8 +47,35 @@ public class MainActivity extends Activity {
 		initializeWorkerThreadRunner();
 		simulationClock = new SimulationClock(timeIntervalAnimationMs, runner);
 		typespeedView = (TypespeedView) findViewById(R.id.typespeed_view);
+		statusView = (StatusView) findViewById(R.id.statusView1);
 
-		game = new Game();
+		Game.GameOverListener gameOverListner = new Game.GameOverListener() {
+
+			@Override
+			public void onGameOver() {
+				MainActivity.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						Log.i(TAG, "Game Over");
+					}
+				});
+			}
+		};
+		Game.WordReachedEndListener wordReachedEndListener = new Game.WordReachedEndListener() {
+
+			@Override
+			public void onWordReachedEnd(final int numberOfWordsToHaveReachedEnd) {
+				MainActivity.this.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						statusView.setText("mistakes: " + numberOfWordsToHaveReachedEnd);
+					}
+				});
+			}
+		};
+		game = new Game(wordReachedEndListener, gameOverListner);
 
 		Button goButton = (Button) findViewById(R.id.go_button);
 		goButton.setOnClickListener(new View.OnClickListener() {
@@ -112,8 +140,8 @@ public class MainActivity extends Activity {
 						if (previousValidRegionEnd >= 0) {
 							CharSequence previousValidWord = s.subSequence(previousValidRegionStart, previousValidRegionEnd);
 							if (previousValidWord != null && previousValidWord.length() != 0) {
-								Log.d(TAG, "adding word: " + previousValidWord);
-								userSubmitWordEventsQueue.offer(previousValidWord);
+								Log.d(TAG, "adding word: " + previousValidWord.toString());
+								userSubmitWordEventsQueue.offer(previousValidWord.toString());
 							}
 						}
 					}
@@ -135,7 +163,7 @@ public class MainActivity extends Activity {
 			@Override
 			public boolean run(float dt) {
 				List<UserKeyEvent> userInput = new ArrayList<UserKeyEvent>();
-				List<CharSequence> submittedWords = new ArrayList<CharSequence>();
+				List<String> submittedWords = new ArrayList<String>();
 				{
 					while (!userInputEventsQueue.isEmpty()) {
 						UserKeyEvent temp = userInputEventsQueue.poll();
@@ -143,7 +171,7 @@ public class MainActivity extends Activity {
 						userInput.add(temp);
 					}
 					while (!userSubmitWordEventsQueue.isEmpty()) {
-						CharSequence submittedWord = userSubmitWordEventsQueue.poll();
+						String submittedWord = userSubmitWordEventsQueue.poll();
 						Log.d(TAG, "reading from BlockingQueue submitted word: " + submittedWord);
 						submittedWords.add(submittedWord);
 					}
