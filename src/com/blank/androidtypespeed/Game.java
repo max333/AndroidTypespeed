@@ -18,7 +18,7 @@ public class Game {
 	private static final String TAG = "Game";
 	private static final int MAX_FAILED_WORDS = 10;
 	private WordGenerator wordGenerator;
-	private float velocity = 0.04f; // percent of screen / second
+	private ScrollingSpeed scrollingSpeed;
 	private Multimap<String, WordWithCoordinates> words = HashMultimap.create();
 	private List<String> successfulWords;
 	private List<String> erroneousWords;
@@ -28,7 +28,7 @@ public class Game {
 	private WordReachedEndListener wordReachEndListener;
 	private GameOverListener gameOverListener;
 	private Random randomGenerator = new Random(829347);
-	
+
 	/**
 	 * To be called when a word goes out of bound.
 	 */
@@ -40,14 +40,49 @@ public class Game {
 	 * To be called when the game is over.
 	 */
 	public interface GameOverListener {
-		public void onGameOver(); // TODO pass the whole Game object back?
+		public void onGameOver(GameStatistics gameStatistics); // TODO pass the whole Game object back?
+	}
+	
+	/**
+	 * 
+	 */
+	public class GameStatistics {
+		private final float totalCPS;
+		private final float validCPS;
+		
+		public GameStatistics() {
+			int successfulChars = 0;
+			{
+				for (String successfulWord : successfulWords) {
+					successfulChars += successfulWord.length();
+				}
+			}
+			validCPS = (float) successfulChars / totalElapsedTime;
+			
+			int allSubmittedChars = successfulChars;
+			{
+				for (String erroneousWord : erroneousWords) {
+					allSubmittedChars += erroneousWord.length();
+				}
+			}
+			totalCPS = (float) allSubmittedChars / totalElapsedTime;
+		}
+
+		public float getTotalCPS() {
+			return totalCPS;
+		}
+
+		public float getValidCPS() {
+			return validCPS;
+		}
 	}
 
 	/**
 	 * 
 	 */
-	public Game(WordGenerator wordGenerator, WordReachedEndListener wordReachEndListener, GameOverListener gameOverListener) {
+	public Game(WordGenerator wordGenerator, ScrollingSpeed scrollingSpeed, WordReachedEndListener wordReachEndListener, GameOverListener gameOverListener) {
 		this.wordGenerator = wordGenerator;
+		this.scrollingSpeed = scrollingSpeed;
 		this.wordReachEndListener = wordReachEndListener;
 		this.gameOverListener = gameOverListener;
 		initialize();
@@ -71,7 +106,8 @@ public class Game {
 		totalElapsedTime += dt;
 
 		for (WordWithCoordinates word : words.values()) {
-			word.setX(word.getX() + velocity * dt);
+			float distanceTraveled = scrollingSpeed.distanceTraveled(word.getStartTime(), totalElapsedTime);
+			word.setX(distanceTraveled);
 		}
 
 		updateWordsOutOfBounds();
@@ -157,7 +193,7 @@ public class Game {
 		List<String> generatedWords = wordGenerator.generateWordsIfNeeded(totalElapsedTime);
 		for (String word : generatedWords) {
 			float y = randomGenerator.nextFloat();
-			words.put(word, new WordWithCoordinates(word, 0f, y));
+			words.put(word, new WordWithCoordinates(word, 0f, y, totalElapsedTime));
 		}
 	}
 
@@ -172,7 +208,8 @@ public class Game {
 	 * 
 	 */
 	private void gameOver() {
-		gameOverListener.onGameOver();
+		GameStatistics gameStatistics = new GameStatistics();
+		gameOverListener.onGameOver(gameStatistics);
 	}
 
 	/**

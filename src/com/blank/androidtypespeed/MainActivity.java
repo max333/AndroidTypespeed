@@ -56,14 +56,15 @@ public class MainActivity extends FragmentActivity {
 		Game.GameOverListener gameOverListner = new Game.GameOverListener() {
 
 			@Override
-			public void onGameOver() {
+			public void onGameOver(final Game.GameStatistics gameStatistics) {
 				simulationClock.stop();
-				
+
 				MainActivity.this.runOnUiThread(new Runnable() {
 
 					@Override
 					public void run() {
 						GameOverDialogFragment gameOverDialogFragment = new GameOverDialogFragment();
+						gameOverDialogFragment.initialize(gameStatistics);
 						gameOverDialogFragment.show(getSupportFragmentManager(), "game_over_dialog");
 						Log.i(TAG, "Game Over");
 					}
@@ -79,12 +80,12 @@ public class MainActivity extends FragmentActivity {
 					@Override
 					public void run() {
 						statusView.setText("mistakes: " + numberOfWordsToHaveReachedEnd);
-						errorMediaPlayer.start(); 
+						errorMediaPlayer.start();
 					}
 				});
 			}
 		};
-		
+
 		// TODO doesn't that belong more in the Game part??
 		Iterator<String> randomWordsIterator = null;
 		try {
@@ -96,8 +97,10 @@ public class MainActivity extends FragmentActivity {
 		float pace = 5f; // char / second
 		float paceMultiplierAfterOneMinute = 2.0f;
 		WordGenerator wordGenerator = new WordGenerator.Logarithm(randomWordsIterator, pace, paceMultiplierAfterOneMinute);
+		//ScrollingSpeed scrollingSpeed = new ScrollingSpeed.ConstantVelocity(0.02f);
+		ScrollingSpeed scrollingSpeed = new ScrollingSpeed.Logarithm(0.02f, paceMultiplierAfterOneMinute);
 
-		game = new Game(wordGenerator, wordReachedEndListener, gameOverListner);
+		game = new Game(wordGenerator, scrollingSpeed, wordReachedEndListener, gameOverListner);
 
 		Button goButton = (Button) findViewById(R.id.go_button);
 		goButton.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +116,7 @@ public class MainActivity extends FragmentActivity {
 		initUserEditListener();
 		userInput.addTextChangedListener(userEditListener);
 
-		// TODO should run this in some other thread.  Maybe.  Not quite wrong the way it is.
+		// TODO should run this in some other thread. Maybe. Not quite wrong the way it is.
 		errorMediaPlayer = MediaPlayer.create(this, R.raw.error_135125);
 	}
 

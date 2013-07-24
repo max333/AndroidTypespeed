@@ -51,7 +51,7 @@ public interface RandomWordIterator extends Iterator<String> {
 		// TODO poor.
 		private static void poorRandomize(List<String> words) {
 			Random random = new Random(2342);
-			for (int i = 0; i <= words.size() / 2; i++) {
+			for (int i = 0; i <= words.size(); i++) {
 				int iSwap1 = random.nextInt(words.size());
 				int iSwap2 = random.nextInt(words.size());
 				if (iSwap1 != iSwap2) {

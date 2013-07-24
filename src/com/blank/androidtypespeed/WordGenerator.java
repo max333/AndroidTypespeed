@@ -25,42 +25,28 @@ public interface WordGenerator {
 		private Iterator<String> randomWordsIterator;
 		private String nextWord;
 		private int nCharactersGeneratedSoFar;
-		private float pace; // char / second
-		// 1.5 would mean the pace is 50% faster after a minute.
-		private float paceMultiplierAfterOneMinute;
-		private float a;
-		private float b;
 		private float integralAtTZero;
+		private LogarithmTimeProcess logarithmTimeProcess;
 
 		/**
 		 * 
 		 */
 		public Logarithm(Iterator<String> randomWords, float pace, float paceMultiplierAfterOneMinute) {
 			super();
+			logarithmTimeProcess = new LogarithmTimeProcess(pace, paceMultiplierAfterOneMinute);
 			nCharactersGeneratedSoFar = 0;
 			this.randomWordsIterator = randomWords;
 			nextWord = this.randomWordsIterator.next();
-			this.pace = pace;
-			this.paceMultiplierAfterOneMinute = paceMultiplierAfterOneMinute;
-
-			b = (float) Math.exp(pace);
-			a = (float) (Math.exp(pace * paceMultiplierAfterOneMinute) - b) / 60.f;
-			integralAtTZero = integralOfPaceAtT(0f);
+			integralAtTZero = logarithmTimeProcess.integralOfPaceAtT(0f);
 		}
 
-		/**
-		 * Integral of ln(ax + b) = ((ax + b) ln(ax + b) - ax) / a
-		 */
-		private float integralOfPaceAtT(float t) {
-			float atpb = a * t + b;
-			return (atpb * (float) Math.log(atpb) - a * t) / a;
-		}
+		
 
 		/**
 		 * 
 		 */
 		private float integralFromTZero(float t) {
-			return integralOfPaceAtT(t) - integralAtTZero;
+			return logarithmTimeProcess.integralOfPaceAtT(t) - integralAtTZero;
 		}
 
 		/**

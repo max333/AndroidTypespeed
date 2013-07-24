@@ -1,17 +1,31 @@
++ when typing long word in EditView, it only shows the last chars.
+
++ Database of games (GSON? non-searchable, or parts as GSON?):
+  word file (with possible options), random seed, cps, total time, successful words (with time), erroneous words (with time)
+  (later: when the back key was pressed).
+
 + Related to above, but different: increase the scroll speed.  It is not actually necessary,
   but it would be better on smaller screens to avoid word overlaps when many words are being
   generated.
   
 + Words overlap.  Maybe not possible to avoid, but should minimize.
-
+  Should rescale the y-dimension since some words can be too low (true?).
+  Should split the screen in lines, from ascent value and keep track of the 
+  order in which they were used.
+  
 + Faster scrolling speed, linked to word generation rate.
 
 + Settings to remove sound.
+  Also, is it possible to remove the keyboard sound?  
+  Could make different sound when a submitted word is accepted or not.
 
 + Stats to output at game over:
-  average word length, average successful word lenght. 
+  cps/wpm
+  rank relative to high scores (same game type).
+  average word length, average successful word length.
+  wrong words. 
   
-+ Should rescale the y-dimension since some words can be too low (true?).
+
   
 + StatusView should have "x" icons with a background that becomes redder.
 
@@ -31,8 +45,12 @@
     -speed
     -text size, font
     
-+ Sound effects.  Haptic effect.
-  http://www.freesound.org/search/?q=error
++ Sound effects: change the pitch of the error as we get closer to the limit.  
+
++ Haptic effect.
+
+
++ Pseudo-antialiasing.
 
 + Pressing Go after Game Over continues the game.
   Maybe should change the button to New Game at that stage.
