@@ -13,7 +13,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
@@ -79,7 +78,8 @@ public class MainActivity extends FragmentActivity {
 
 					@Override
 					public void run() {
-						statusView.setText("mistakes: " + numberOfWordsToHaveReachedEnd);
+						int numMistakes = Math.min(numberOfWordsToHaveReachedEnd, game.getMaxNumFailedWords());
+						statusView.setText("mistakes: " + numMistakes);
 						errorMediaPlayer.start();
 					}
 				});
@@ -98,7 +98,7 @@ public class MainActivity extends FragmentActivity {
 		float paceMultiplierAfterOneMinute = 2.0f;
 		WordGenerator wordGenerator = new WordGenerator.Logarithm(randomWordsIterator, pace, paceMultiplierAfterOneMinute);
 		//ScrollingSpeed scrollingSpeed = new ScrollingSpeed.ConstantVelocity(0.02f);
-		ScrollingSpeed scrollingSpeed = new ScrollingSpeed.Logarithm(0.02f, paceMultiplierAfterOneMinute);
+		ScrollingSpeed scrollingSpeed = new ScrollingSpeed.Logarithm(0.2f, paceMultiplierAfterOneMinute);
 
 		game = new Game(wordGenerator, scrollingSpeed, wordReachedEndListener, gameOverListner);
 
@@ -111,8 +111,7 @@ public class MainActivity extends FragmentActivity {
 		});
 
 		userInput = (EditText) findViewById(R.id.user_input);
-		userInput.setRawInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS); // TODO could put in xml
-																			// instead?
+		
 		initUserEditListener();
 		userInput.addTextChangedListener(userEditListener);
 

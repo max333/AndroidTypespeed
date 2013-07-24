@@ -1,30 +1,35 @@
++ When the user touches anywhere after the game over dialog appears, it disappears.
+  Would be simpler to have an Activity instead of a Dialog on game over.
++ When showing game over dialog, maybe disable buttons for 0.25s in case the user is typing furiously and
+  might hit a Dialog button.
+
 + when typing long word in EditView, it only shows the last chars.
 
 + Database of games (GSON? non-searchable, or parts as GSON?):
-  word file (with possible options), random seed, cps, total time, successful words (with time), erroneous words (with time)
+  word file (with possible options)(language of phone?), random seed(s), cps, total time, successful words (with time), erroneous words (with time)
+  hardware/software keyboard (name of software keyboard).
   (later: when the back key was pressed).
+  (later: db transfer to GAE, every game at first, but if player plays often, every few games.
+          no transfer if battery is low.  Need to keep in Android DB the status if was sent to 
+          GAE or in transit.)
++ Stats to output at game over:
+  cps/wpm
+  rank relative to high scores (same game type).
+  average word length, average successful word length.
+  wrong words. 
+          
++ (later) sharing with friends.
 
-+ Related to above, but different: increase the scroll speed.  It is not actually necessary,
-  but it would be better on smaller screens to avoid word overlaps when many words are being
-  generated.
++ Make better word list.  Remove beforehand the "word's" instead of filtering.
   
 + Words overlap.  Maybe not possible to avoid, but should minimize.
   Should rescale the y-dimension since some words can be too low (true?).
   Should split the screen in lines, from ascent value and keep track of the 
   order in which they were used.
   
-+ Faster scrolling speed, linked to word generation rate.
-
 + Settings to remove sound.
   Also, is it possible to remove the keyboard sound?  
   Could make different sound when a submitted word is accepted or not.
-
-+ Stats to output at game over:
-  cps/wpm
-  rank relative to high scores (same game type).
-  average word length, average successful word length.
-  wrong words. 
-  
 
   
 + StatusView should have "x" icons with a background that becomes redder.
@@ -33,8 +38,6 @@
   instead of the left.  Will also need to modify the speed of each word depending on its width
   if each word is to spend the same time on screen.
 
-+ When showing game over dialog, maybe disable buttons for 0.25s in case the user is typing furiously and
-  might hit a Dialog button.
 
 + High scores, separated by speed level.
 
@@ -49,7 +52,6 @@
 
 + Haptic effect.
 
-
 + Pseudo-antialiasing.
 
 + Pressing Go after Game Over continues the game.
@@ -60,13 +62,7 @@
 + Pause (user request, or phone call...).  Should save the full game state (GSON?).
   What if the orientation changed... are the rules even the same?
   The number of lines are going to be different.
-  The speed for each word should be different: (full length - word length) / dt.
-  Vary the speed according to word length such that each word remains on screen the same time.
 
-+ Maybe could save the positions as percent of screen size.  Could then refit on 
-  deformed screen.  Maybe the words would overlap then, but a small price to pay.
-  Could also change the font size on resize.
-  
 + Will need to find some list of words.  Maybe many languages.
   Maybe let users use their own file.
 
@@ -86,7 +82,3 @@
 
 + On my phone, landscape orientation does not show the view above the keyboard, but just
   add a white box to type text since it seems there is not enough space.
-  
-+ Keep the screen from sleeping when there is an ongoing game.
-
-+ the number of missed words displayed can get above 10 (when many words go out of bounds at the same time step).

@@ -16,7 +16,7 @@ import com.google.common.collect.Multimap;
  */
 public class Game {
 	private static final String TAG = "Game";
-	private static final int MAX_FAILED_WORDS = 10;
+	private int maxNumFailedWords = 10;
 	private WordGenerator wordGenerator;
 	private ScrollingSpeed scrollingSpeed;
 	private Multimap<String, WordWithCoordinates> words = HashMultimap.create();
@@ -132,7 +132,7 @@ public class Game {
 		for (WordWithCoordinates wordOutOfBound : wordsOutOfBounds) {
 			words.remove(wordOutOfBound.getWord(), wordOutOfBound);
 			counterOutOfBoundsWords++;
-			if (counterOutOfBoundsWords >= MAX_FAILED_WORDS)
+			if (counterOutOfBoundsWords >= maxNumFailedWords)
 				gameOver();
 		}
 		if (!wordsOutOfBounds.isEmpty()) {
@@ -218,5 +218,14 @@ public class Game {
 	public Collection<WordWithCoordinates> getWords() {
 		return new ImmutableList.Builder<WordWithCoordinates>().addAll(words.values()).build();
 	}
+
+	/**
+	 * 
+	 */
+	public int getMaxNumFailedWords() {
+		return maxNumFailedWords;
+	}
+	
+	
 
 }
