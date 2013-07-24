@@ -1,8 +1,19 @@
-+ Word generator over time to keep up with a time increasing target rate. Log.
-
 + Related to above, but different: increase the scroll speed.  It is not actually necessary,
   but it would be better on smaller screens to avoid word overlaps when many words are being
   generated.
+  
++ Words overlap.  Maybe not possible to avoid, but should minimize.
+
++ Faster scrolling speed, linked to word generation rate.
+
++ Settings to remove sound.
+
++ Stats to output at game over:
+  average word length, average successful word lenght. 
+  
++ Should rescale the y-dimension since some words can be too low (true?).
+  
++ StatusView should have "x" icons with a background that becomes redder.
 
 + Modify OutOfBounds such that it checks for the right side of the word getting out
   instead of the left.  Will also need to modify the speed of each word depending on its width
@@ -22,6 +33,11 @@
     
 + Sound effects.  Haptic effect.
   http://www.freesound.org/search/?q=error
+
++ Pressing Go after Game Over continues the game.
+  Maybe should change the button to New Game at that stage.
+
++ It seems there already is an ActionBar although I did not configure it.  Probably would look different on older devices.
 
 + Pause (user request, or phone call...).  Should save the full game state (GSON?).
   What if the orientation changed... are the rules even the same?
@@ -47,3 +63,12 @@
 + Target api 2.3 since I read somewhere in Android Pro 4 about proguard or such being
   setup only for that version and higher.
   
++ On my phone, keyboard sometimes suggest to add new word to dictionary.
+  Maybe there is some way to control this.  I already eliminated the suggestions.
+
++ On my phone, landscape orientation does not show the view above the keyboard, but just
+  add a white box to type text since it seems there is not enough space.
+  
++ Keep the screen from sleeping when there is an ongoing game.
+
++ the number of missed words displayed can get above 10 (when many words go out of bounds at the same time step).

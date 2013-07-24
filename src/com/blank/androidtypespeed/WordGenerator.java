@@ -21,7 +21,7 @@ public interface WordGenerator {
 	 * Pace(t) = ln(a * t + b).
 	 * So b = exp(pace) and a = (exp(pace * paceMultiplierAfterOneMinute) - b)
 	 */
-	public static class Logarigthm implements WordGenerator {
+	public static class Logarithm implements WordGenerator {
 		private Iterator<String> randomWordsIterator;
 		private String nextWord;
 		private int nCharactersGeneratedSoFar;
@@ -35,7 +35,7 @@ public interface WordGenerator {
 		/**
 		 * 
 		 */
-		public Logarigthm(Iterator<String> randomWords, float pace, float paceMultiplierAfterOneMinute) {
+		public Logarithm(Iterator<String> randomWords, float pace, float paceMultiplierAfterOneMinute) {
 			super();
 			nCharactersGeneratedSoFar = 0;
 			this.randomWordsIterator = randomWords;

@@ -1,15 +1,14 @@
 package com.blank.androidtypespeed;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
 import android.util.Log;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
 /**
@@ -19,7 +18,7 @@ public class Game {
 	private static final String TAG = "Game";
 	private static final int MAX_FAILED_WORDS = 10;
 	private WordGenerator wordGenerator;
-	private float velocity = 0.02f; // percent of screen / second
+	private float velocity = 0.04f; // percent of screen / second
 	private Multimap<String, WordWithCoordinates> words = HashMultimap.create();
 	private List<String> successfulWords;
 	private List<String> erroneousWords;
@@ -28,8 +27,8 @@ public class Game {
 	private float totalElapsedTime;
 	private WordReachedEndListener wordReachEndListener;
 	private GameOverListener gameOverListener;
-	private Random ramdomGenerator = new Random();
-
+	private Random randomGenerator = new Random(829347);
+	
 	/**
 	 * To be called when a word goes out of bound.
 	 */
@@ -47,7 +46,8 @@ public class Game {
 	/**
 	 * 
 	 */
-	public Game(WordReachedEndListener wordReachEndListener, GameOverListener gameOverListener) {
+	public Game(WordGenerator wordGenerator, WordReachedEndListener wordReachEndListener, GameOverListener gameOverListener) {
+		this.wordGenerator = wordGenerator;
 		this.wordReachEndListener = wordReachEndListener;
 		this.gameOverListener = gameOverListener;
 		initialize();
@@ -62,31 +62,6 @@ public class Game {
 		reachedOutOfBoundsWords = new ArrayList<String>();
 		counterOutOfBoundsWords = 0;
 		totalElapsedTime = 0f;
-
-		float pace = 5f; // char / second
-		float paceMultiplierAfterOneMinute = 2.0f;
-		Iterator<String> randomWordsIterator = new Iterator<String>() {
-			private List<String> words = Arrays.asList("cat", "dog", "mule", "horse", "rabbit");
-			private int counter = 0;
-
-			@Override
-			public boolean hasNext() {
-				return true;
-			}
-
-			@Override
-			public String next() {
-				int index = counter++ % words.size();
-				return words.get(index);
-			}
-
-			@Override
-			public void remove() {
-
-			}
-
-		};
-		wordGenerator = new WordGenerator.Logarigthm(randomWordsIterator, pace, paceMultiplierAfterOneMinute);
 	}
 
 	/**
@@ -181,7 +156,7 @@ public class Game {
 	private void updateGenerateNewWords() {
 		List<String> generatedWords = wordGenerator.generateWordsIfNeeded(totalElapsedTime);
 		for (String word : generatedWords) {
-			float y = ramdomGenerator.nextFloat();
+			float y = randomGenerator.nextFloat();
 			words.put(word, new WordWithCoordinates(word, 0f, y));
 		}
 	}
@@ -201,11 +176,10 @@ public class Game {
 	}
 
 	/**
-	 * 
+	 * @return an immutable copy.
 	 */
-	// TODO return copy? Guava.
 	public Collection<WordWithCoordinates> getWords() {
-		return words.values();
+		return new ImmutableList.Builder<WordWithCoordinates>().addAll(words.values()).build();
 	}
 
 }

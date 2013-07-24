@@ -1,14 +1,17 @@
 package com.blank.androidtypespeed;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.app.Activity;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -23,7 +26,7 @@ import android.widget.EditText;
  * Note: in the manifest.xml, this activity is declared with android:windowSoftInputMode="adjustResize"
  * so the software keyboard won't just hide the TypespeedView, but resize it.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 	protected static final String TAG = "MainActivity";
 	private TypespeedView typespeedView;
 	private StatusView statusView;
@@ -34,6 +37,7 @@ public class MainActivity extends Activity {
 	private BlockingQueue<UserKeyEvent> userInputEventsQueue = new LinkedBlockingQueue<UserKeyEvent>();
 	private BlockingQueue<String> userSubmitWordEventsQueue = new LinkedBlockingQueue<String>();
 	private TextWatcher userEditListener;
+	private MediaPlayer errorMediaPlayer;
 
 	/**
 	 * 
@@ -59,6 +63,8 @@ public class MainActivity extends Activity {
 
 					@Override
 					public void run() {
+						GameOverDialogFragment gameOverDialogFragment = new GameOverDialogFragment();
+						gameOverDialogFragment.show(getSupportFragmentManager(), "game_over_dialog");
 						Log.i(TAG, "Game Over");
 					}
 				});
@@ -73,11 +79,25 @@ public class MainActivity extends Activity {
 					@Override
 					public void run() {
 						statusView.setText("mistakes: " + numberOfWordsToHaveReachedEnd);
+						errorMediaPlayer.start(); 
 					}
 				});
 			}
 		};
-		game = new Game(wordReachedEndListener, gameOverListner);
+		
+		// TODO doesn't that belong more in the Game part??
+		Iterator<String> randomWordsIterator = null;
+		try {
+			randomWordsIterator = new RandomWordIterator.Scowl10(getAssets());
+		} catch (IOException e) {
+			// TODO fail for real
+			e.printStackTrace();
+		}
+		float pace = 5f; // char / second
+		float paceMultiplierAfterOneMinute = 2.0f;
+		WordGenerator wordGenerator = new WordGenerator.Logarithm(randomWordsIterator, pace, paceMultiplierAfterOneMinute);
+
+		game = new Game(wordGenerator, wordReachedEndListener, gameOverListner);
 
 		Button goButton = (Button) findViewById(R.id.go_button);
 		goButton.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +112,9 @@ public class MainActivity extends Activity {
 																			// instead?
 		initUserEditListener();
 		userInput.addTextChangedListener(userEditListener);
+
+		// TODO should run this in some other thread.  Maybe.  Not quite wrong the way it is.
+		errorMediaPlayer = MediaPlayer.create(this, R.raw.error_135125);
 	}
 
 	// "Enter", "Tab" or "Space"

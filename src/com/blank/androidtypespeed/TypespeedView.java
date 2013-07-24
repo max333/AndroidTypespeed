@@ -56,7 +56,8 @@ public class TypespeedView extends View {
 	}
 
 	/**
-	 *
+	 * This must not be the actual collection of words in the game engine, but a copy
+	 * since it can otherwise lead to ConcurrentModificationException.
 	 */
 	public void setWordsWithCoordinates(Collection<WordWithCoordinates> words) {
 		this.words = words;
