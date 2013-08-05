@@ -2,6 +2,8 @@ package com.blank.androidtypespeed;
 
 import java.util.Collection;
 
+import com.blank.androidtypespeed.game.WordWithCoordinates;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;

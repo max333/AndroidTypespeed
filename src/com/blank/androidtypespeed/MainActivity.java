@@ -9,6 +9,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.blank.androidtypespeed.game.Game;
+import com.blank.androidtypespeed.game.RandomWordIterator;
+import com.blank.androidtypespeed.game.ScrollingSpeed;
+import com.blank.androidtypespeed.game.WordGenerator;
+
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

@@ -1,9 +1,10 @@
 + When the user touches anywhere after the game over dialog appears, it disappears.
   Would be simpler to have an Activity instead of a Dialog on game over.
-+ When showing game over dialog, maybe disable buttons for 0.25s in case the user is typing furiously and
-  might hit a Dialog button.
+  Should be a WebView.  Could make a fancy page with angular.js; all the output data could be
+  sent (just string substitution in some header) to the page as a json object.
+  It might actually be possible too to write a javascript function that gets that data from Java code.
 
-+ when typing long word in EditView, it only shows the last chars.
++ when typing long words in EditView, it only shows the last chars.
 
 + Database of games (GSON? non-searchable, or parts as GSON?):
   word file (with possible options)(language of phone?), random seed(s), cps, total time, successful words (with time), erroneous words (with time)
@@ -20,12 +21,14 @@
           
 + (later) sharing with friends.
 
-+ Make better word list.  Remove beforehand the "word's" instead of filtering.
++ Make better word list.  Remove beforehand the "[word]'s" instead of filtering.
+  Also filter out morally unacceptable words.
   
 + Words overlap.  Maybe not possible to avoid, but should minimize.
   Should rescale the y-dimension since some words can be too low (true?).
   Should split the screen in lines, from ascent value and keep track of the 
   order in which they were used.
+  Or try 3 random placements and compute the overlap and keep if 0 or take the one with less overlap.
   
 + Settings to remove sound.
   Also, is it possible to remove the keyboard sound?  
@@ -41,12 +44,11 @@
 
 + High scores, separated by speed level.
 
-+ After each game show the errors in a Dialog.
-
 + Settings: 
     -color pickers (background/text). Might need a third color if typed characters are shown.
     -speed
-    -text size, font
+    -text size, font (but maybe just give some vague options for size and mostly have it be
+     automatically computed from the screen size).
     
 + Sound effects: change the pitch of the error as we get closer to the limit.  
 
@@ -54,10 +56,9 @@
 
 + Pseudo-antialiasing.
 
-+ Pressing Go after Game Over continues the game.
-  Maybe should change the button to New Game at that stage.
-
-+ It seems there already is an ActionBar although I did not configure it.  Probably would look different on older devices.
++ It seems there already is an ActionBar although I did not configure it.  
+  Probably would look different on older devices.
+  Maybe fine as it is.
 
 + Pause (user request, or phone call...).  Should save the full game state (GSON?).
   What if the orientation changed... are the rules even the same?
@@ -68,6 +69,8 @@
 
 + Make an "About" about the history and link to code on github.
   Creative commons attribution if needed.
+  As WebView.
+  Donation.
 
 + Game variant: mirror (reversed words and text flowing the "wrong" way).
   The configuration could also be used for internationalization.
@@ -78,7 +81,10 @@
   setup only for that version and higher.
   
 + On my phone, keyboard sometimes suggest to add new word to dictionary.
-  Maybe there is some way to control this.  I already eliminated the suggestions.
+  Maybe there is some way to control this.  
+  I already eliminated the suggestions as an option.
 
 + On my phone, landscape orientation does not show the view above the keyboard, but just
   add a white box to type text since it seems there is not enough space.
+  InputMethodService.isFullScreenMode().
+  Can fullscreen mode be disabled?
