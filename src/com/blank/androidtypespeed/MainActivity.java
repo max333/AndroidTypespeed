@@ -9,12 +9,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.blank.androidtypespeed.game.Game;
-import com.blank.androidtypespeed.game.RandomWordIterator;
-import com.blank.androidtypespeed.game.ScrollingSpeed;
-import com.blank.androidtypespeed.game.WordGenerator;
-
+import android.content.Intent;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
@@ -24,6 +21,11 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.blank.androidtypespeed.game.Game;
+import com.blank.androidtypespeed.game.RandomWordIterator;
+import com.blank.androidtypespeed.game.ScrollingSpeed;
+import com.blank.androidtypespeed.game.WordGenerator;
 
 /**
  * 
@@ -63,16 +65,32 @@ public class MainActivity extends FragmentActivity {
 			public void onGameOver(final Game.GameStatistics gameStatistics) {
 				simulationClock.stop();
 
-				MainActivity.this.runOnUiThread(new Runnable() {
+				// need to run all this is some other thread.
+				(new AsyncTask<Void, Void, Integer>() {
 
 					@Override
-					public void run() {
-						GameOverDialogFragment gameOverDialogFragment = new GameOverDialogFragment();
-						gameOverDialogFragment.initialize(gameStatistics);
-						gameOverDialogFragment.show(getSupportFragmentManager(), "game_over_dialog");
-						Log.i(TAG, "Game Over");
+					protected Integer doInBackground(Void... voidd) {
+						return saveGameResultToDB();
 					}
-				});
+
+					@Override
+					protected void onPostExecute(Integer gameId) {
+						// TODO not sure if this really needs to run on the UI thread.
+						Intent gameOverIntent = new Intent(getBaseContext(), GameOverActivity.class);
+						gameOverIntent.putExtra(GameOverActivity.GAME_ID, gameId);
+					}
+				}).execute();
+
+				// MainActivity.this.runOnUiThread(new Runnable() {
+				//
+				// @Override
+				// public void run() {
+				// GameOverDialogFragment gameOverDialogFragment = new GameOverDialogFragment();
+				// gameOverDialogFragment.initialize(gameStatistics);
+				// gameOverDialogFragment.show(getSupportFragmentManager(), "game_over_dialog");
+				// Log.i(TAG, "Game Over");
+				// }
+				// });
 			}
 		};
 		Game.WordReachedEndListener wordReachedEndListener = new Game.WordReachedEndListener() {
@@ -99,11 +117,11 @@ public class MainActivity extends FragmentActivity {
 			// TODO fail for real
 			e.printStackTrace();
 		}
-		float pace = 5f; // char / second
+		float pace = 2f; // char / second
 		float paceMultiplierAfterOneMinute = 2.0f;
 		WordGenerator wordGenerator = new WordGenerator.Logarithm(randomWordsIterator, pace, paceMultiplierAfterOneMinute);
-		//ScrollingSpeed scrollingSpeed = new ScrollingSpeed.ConstantVelocity(0.02f);
-		ScrollingSpeed scrollingSpeed = new ScrollingSpeed.Logarithm(0.2f, paceMultiplierAfterOneMinute);
+		// ScrollingSpeed scrollingSpeed = new ScrollingSpeed.ConstantVelocity(0.02f);
+		ScrollingSpeed scrollingSpeed = new ScrollingSpeed.Logarithm(0.02f, paceMultiplierAfterOneMinute);
 
 		game = new Game(wordGenerator, scrollingSpeed, wordReachedEndListener, gameOverListner);
 
@@ -116,7 +134,7 @@ public class MainActivity extends FragmentActivity {
 		});
 
 		userInput = (EditText) findViewById(R.id.user_input);
-		
+
 		initUserEditListener();
 		userInput.addTextChangedListener(userEditListener);
 
@@ -247,6 +265,14 @@ public class MainActivity extends FragmentActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	/**
+	 * 
+	 */
+	private Integer saveGameResultToDB() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

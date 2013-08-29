@@ -27,14 +27,14 @@ public interface WordGenerator {
 		private String nextWord;
 		private int nCharactersGeneratedSoFar;
 		private float integralAtTZero;
-		private LogarithmTimeProcess logarithmTimeProcess;
+		private LogarithmicTimeProcess logarithmTimeProcess;
 
 		/**
 		 * 
 		 */
 		public Logarithm(Iterator<String> randomWords, float pace, float paceMultiplierAfterOneMinute) {
 			super();
-			logarithmTimeProcess = new LogarithmTimeProcess(pace, paceMultiplierAfterOneMinute);
+			logarithmTimeProcess = new LogarithmicTimeProcess(pace, paceMultiplierAfterOneMinute);
 			nCharactersGeneratedSoFar = 0;
 			this.randomWordsIterator = randomWords;
 			nextWord = this.randomWordsIterator.next();

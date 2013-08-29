@@ -1,3 +1,8 @@
++ text-to-speech?
+
++ Save to DB all game parameters, including the word file (with md5sum) and random seed.
+  All missed and successful words, and words that reached the end of the file.
+
 + When the user touches anywhere after the game over dialog appears, it disappears.
   Would be simpler to have an Activity instead of a Dialog on game over.
   Should be a WebView.  Could make a fancy page with angular.js; all the output data could be

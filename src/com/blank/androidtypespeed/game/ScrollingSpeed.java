@@ -31,13 +31,13 @@ public interface ScrollingSpeed {
 	 * 
 	 */
 	public static class Logarithm implements ScrollingSpeed {
-		private LogarithmTimeProcess logarithmTimeProcess;
+		private LogarithmicTimeProcess logarithmTimeProcess;
 		
 		/**
 		 * 
 		 */
 		public Logarithm(float pace, float paceMultiplierAfterOneMinute) {
-			logarithmTimeProcess = new LogarithmTimeProcess(pace, paceMultiplierAfterOneMinute);
+			logarithmTimeProcess = new LogarithmicTimeProcess(pace, paceMultiplierAfterOneMinute);
 		}
 
 		/**
