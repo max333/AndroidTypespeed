@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +28,8 @@ import com.blank.androidtypespeed.game.Game;
 import com.blank.androidtypespeed.game.RandomWordIterator;
 import com.blank.androidtypespeed.game.ScrollingSpeed;
 import com.blank.androidtypespeed.game.WordGenerator;
+import com.blank.androidtypespeed.game.WordLengthMeasurer;
+import com.blank.androidtypespeed.game.WordWithCoordinates;
 
 /**
  * 
@@ -121,9 +125,61 @@ public class MainActivity extends FragmentActivity {
 		float paceMultiplierAfterOneMinute = 2.0f;
 		WordGenerator wordGenerator = new WordGenerator.Logarithm(randomWordsIterator, pace, paceMultiplierAfterOneMinute);
 		// ScrollingSpeed scrollingSpeed = new ScrollingSpeed.ConstantVelocity(0.02f);
-		ScrollingSpeed scrollingSpeed = new ScrollingSpeed.Logarithm(0.02f, paceMultiplierAfterOneMinute);
+		// ScrollingSpeed scrollingSpeed = new ScrollingSpeed.Logarithm(0.02f,
+		// paceMultiplierAfterOneMinute);
+		ScrollingSpeed scrollingSpeed = new ScrollingSpeed.Logarithm(0.2f, paceMultiplierAfterOneMinute);
 
-		game = new Game(wordGenerator, scrollingSpeed, wordReachedEndListener, gameOverListner);
+		/**
+		 * Does not always return the right length since it needs to compute the result asynchronously on the UI thread.
+		 * But it should not really matter since the word length will most likely have been computed by the time
+		 * the word reaches the end.  The length is set to 0 until it is really computed. 
+		 * 
+		 */
+		// Warning: there can be problems if the measurer is not ready when the game starts.
+		// TODO maybe the words which hit the wall should be a value returned by the view.
+		// TODO does not delete the removed words from the hash map.
+		WordLengthMeasurer wordLengthMeasurer = new WordLengthMeasurer() {
+			private final static float DEFAULT_LENGTH_IF_NOT_COMPUTED = 0f;
+			// WordWithCoordinates is OK as a hash key since its hashCode does not use the
+			// (changing) coordinates.
+			private ConcurrentHashMap<WordWithCoordinates, Float> mapWordToLength = new ConcurrentHashMap<WordWithCoordinates, Float>();
+
+			/**
+			 * From WordLengthMeasurer interface.
+			 * @return the ratio of the word as drawn with the current font relative to the total width.
+			 *         If it is not present in the hash map, returns 0, but the result will be computed later.
+			 */
+			@Override
+			public float getLengthRatio(WordWithCoordinates word) {
+				Float length = mapWordToLength.get(word);
+				if (length != null) {
+					return length;
+				} else {
+					computeLengthOnUIThreadAndSetInConcurrentHashMap(word);
+					return DEFAULT_LENGTH_IF_NOT_COMPUTED;
+				}
+			}
+
+			/**
+			 * 
+			 */
+			private void computeLengthOnUIThreadAndSetInConcurrentHashMap(final WordWithCoordinates word) {
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						int width = typespeedView.getWidth();
+						if (width != 0) { // might be 0 if typespeedView is not yet displayed.
+							int wordWidth = typespeedView.computeTextLength(word.getWord());
+							float lengthRatio = (wordWidth / (float) width);
+							mapWordToLength.put(word,  lengthRatio);
+						}
+					}
+				});
+			}
+		};
+
+		game = new Game(wordGenerator, scrollingSpeed, wordLengthMeasurer, wordReachedEndListener, gameOverListner);
 
 		Button goButton = (Button) findViewById(R.id.go_button);
 		goButton.setOnClickListener(new View.OnClickListener() {

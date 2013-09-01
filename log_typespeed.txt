@@ -1,7 +1,37 @@
++ There can be pauses with no words on screen.  Should force the
+
++ Add the score in MainActivity: the total number of valid characters.
+  Do something special if the high score is breached.
+
++ Make "Enter" a valid word termination key, on top of "Space".
+
++ (Completely different game) Some sort of strategy game where the choice
+  of which word to type first is important.
+  Tetris (Carlos's idea)?
+
++ fade and spin words when they are done (typed or hit the wall).
+  Blue or red.
+  
++ Fluid dynamics.
+  Words apply force on fluid when active, and feel force from fluid when done.
+  Could separate the letters as independent objects, or pixels become point particles. 
+  Need at least two interaction
+  points per object on which the fluid acts to get rotation.
+
 + text-to-speech?
+
++ lock screen orientation.
+  Essential now since otherwise the word length (used to check when it hits the wall) would be invalid after a flip.
+
++ display keyboard at all times instead of activating it by having the focus in the EditView.
+
++ Do not let the View stop the screen for shutting down.  But maybe leave it as such
+  for development.
 
 + Save to DB all game parameters, including the word file (with md5sum) and random seed.
   All missed and successful words, and words that reached the end of the file.
+  Error types (difficult to define and to know which word was attempted).
+
 
 + When the user touches anywhere after the game over dialog appears, it disappears.
   Would be simpler to have an Activity instead of a Dialog on game over.
@@ -42,10 +72,6 @@
   
 + StatusView should have "x" icons with a background that becomes redder.
 
-+ Modify OutOfBounds such that it checks for the right side of the word getting out
-  instead of the left.  Will also need to modify the speed of each word depending on its width
-  if each word is to spend the same time on screen.
-
 
 + High scores, separated by speed level.
 
@@ -69,21 +95,16 @@
   What if the orientation changed... are the rules even the same?
   The number of lines are going to be different.
 
-+ Will need to find some list of words.  Maybe many languages.
-  Maybe let users use their own file.
++ Maybe let users use their own word file, different languages (right-to-left).
 
 + Make an "About" about the history and link to code on github.
   Creative commons attribution if needed.
   As WebView.
-  Donation.
 
 + Game variant: mirror (reversed words and text flowing the "wrong" way).
   The configuration could also be used for internationalization.
 
 + Game variant: Add numbers or symbols to words.
-  
-+ Target api 2.3 since I read somewhere in Android Pro 4 about proguard or such being
-  setup only for that version and higher.
   
 + On my phone, keyboard sometimes suggest to add new word to dictionary.
   Maybe there is some way to control this.  

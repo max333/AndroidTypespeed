@@ -28,6 +28,8 @@ public class Game {
 	private float totalElapsedTime;
 	private WordReachedEndListener wordReachEndListener;
 	private GameOverListener gameOverListener;
+	private WordLengthMeasurer wordLengthMeasurer;
+	// TODO change to true random (new Random()) when development is done.  Reproducibility for development.
 	private Random randomGenerator = new Random(829347);
 
 	/**
@@ -81,8 +83,9 @@ public class Game {
 	/**
 	 * 
 	 */
-	public Game(WordGenerator wordGenerator, ScrollingSpeed scrollingSpeed, WordReachedEndListener wordReachEndListener, GameOverListener gameOverListener) {
+	public Game(WordGenerator wordGenerator, ScrollingSpeed scrollingSpeed, WordLengthMeasurer wordLengthMeasurer, WordReachedEndListener wordReachEndListener, GameOverListener gameOverListener) {
 		this.wordGenerator = wordGenerator;
+		this.wordLengthMeasurer = wordLengthMeasurer;
 		this.scrollingSpeed = scrollingSpeed;
 		this.wordReachEndListener = wordReachEndListener;
 		this.gameOverListener = gameOverListener;
@@ -106,14 +109,20 @@ public class Game {
 	public void update(float dt, List<String> submittedWords, List<UserKeyEvent> userInput) {
 		totalElapsedTime += dt;
 
+		updateScroll();
+		updateWordsOutOfBounds();
+		updateSubmittedWords(submittedWords);
+		updateGenerateNewWords();
+	}
+
+	/**
+	 * Move all words.
+	 */
+	private void updateScroll() {
 		for (WordWithCoordinates word : words.values()) {
 			float distanceTraveled = scrollingSpeed.distanceTraveled(word.getStartTime(), totalElapsedTime);
 			word.setX(distanceTraveled);
 		}
-
-		updateWordsOutOfBounds();
-		updateSubmittedWords(submittedWords);
-		updateGenerateNewWords();
 	}
 
 	/**
@@ -133,6 +142,8 @@ public class Game {
 		for (WordWithCoordinates wordOutOfBound : wordsOutOfBounds) {
 			words.remove(wordOutOfBound.getWord(), wordOutOfBound);
 			counterOutOfBoundsWords++;
+			Log.d(TAG, "words out of bounds this step: " + wordOutOfBound);
+			Log.d(TAG, "words out of bounds counter: " + counterOutOfBoundsWords);
 			if (counterOutOfBoundsWords >= maxNumFailedWords)
 				gameOver();
 		}
@@ -191,7 +202,7 @@ public class Game {
 	 * Might add new words if it is required.
 	 */
 	private void updateGenerateNewWords() {
-		List<String> generatedWords = wordGenerator.generateWordsIfNeeded(totalElapsedTime);
+		List<String> generatedWords = wordGenerator.generateWordsIfNeeded(totalElapsedTime, words.size());
 		for (String word : generatedWords) {
 			float y = randomGenerator.nextFloat();
 			words.put(word, new WordWithCoordinates(word, 0f, y, totalElapsedTime));
@@ -202,7 +213,7 @@ public class Game {
 	 *
 	 */
 	private boolean checkIfWordOutOfBound(WordWithCoordinates word) {
-		return (word.getX() >= 1.0f);
+		return (word.getX() + wordLengthMeasurer.getLengthRatio(word) >= 1.0f);
 	}
 
 	/**
@@ -226,7 +237,4 @@ public class Game {
 	public int getMaxNumFailedWords() {
 		return maxNumFailedWords;
 	}
-	
-	
-
 }

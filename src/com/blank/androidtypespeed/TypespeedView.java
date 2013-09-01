@@ -2,6 +2,7 @@ package com.blank.androidtypespeed;
 
 import java.util.Collection;
 
+import com.blank.androidtypespeed.game.WordLengthMeasurer;
 import com.blank.androidtypespeed.game.WordWithCoordinates;
 
 import android.annotation.TargetApi;
@@ -25,12 +26,14 @@ public class TypespeedView extends View {
 	private TextPaint textPaint;
 	private Paint backgroundPaint;
 	private Collection<WordWithCoordinates> words;
+	private Context context;
 
 	/**
 	 * 
 	 */
 	public TypespeedView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		this.context = context;
 		textPaint = new TextPaint();
 		{
 			textPaint.setColor(Color.BLACK);
@@ -99,5 +102,15 @@ public class TypespeedView extends View {
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		Log.d(TAG, "measure: " + widthMeasureSpec + " x " + heightMeasureSpec);
+	}
+
+	/**
+	 * The length in pixels for the given word, according the font.
+	 */
+	public int computeTextLength(String word) {
+		Rect rect = new Rect();
+		textPaint.getTextBounds(word, 0, word.length(), rect);
+		int wordWidth = rect.right;
+		return wordWidth;
 	}
 }

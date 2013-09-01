@@ -16,7 +16,7 @@ public interface WordGenerator {
 	/**
 	 * 
 	 */
-	public List<String> generateWordsIfNeeded(float time);
+	public List<String> generateWordsIfNeeded(float time, int currentNumberOfDisplayedWords);
 
 	/**
 	 * Pace(t) = ln(a * t + b).
@@ -50,11 +50,12 @@ public interface WordGenerator {
 			return logarithmTimeProcess.integralOfPaceAtT(t) - integralAtTZero;
 		}
 
+
 		/**
 		 * 
 		 */
 		@Override
-		public List<String> generateWordsIfNeeded(float time) {
+		public List<String> generateWordsIfNeeded(float time, int currentNumberOfDisplayedWords) {
 			List<String> generatedWords = new ArrayList<String>();
 			{
 				int nCharactersToGenerate = (int) integralFromTZero(time) - nCharactersGeneratedSoFar;
@@ -63,7 +64,12 @@ public interface WordGenerator {
 					nCharactersGeneratedSoFar += nextWord.length();
 
 					generatedWords.add(nextWord);
-					
+					nextWord = randomWordsIterator.next();
+				}
+				
+				if (currentNumberOfDisplayedWords == 0 && generatedWords.isEmpty()) {
+					Log.d(TAG, "adding word because none: " + nextWord);
+					generatedWords.add(nextWord);
 					nextWord = randomWordsIterator.next();
 				}
 			}
@@ -71,3 +77,4 @@ public interface WordGenerator {
 		}
 	}
 }
+ 
